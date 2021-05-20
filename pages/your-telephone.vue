@@ -1,47 +1,10 @@
-<template>
-    <div class="container">
-        <div class="row">
-            <div class="col-12">
-                <nuxt-link to="load-photo" class="btn btn-back">
-                    <img src="images/back.png" alt="back" />
-                </nuxt-link>
-            </div>
-            <div class="col-12">
-                <div class="step">03</div>
-            </div>
-            <div class="col-9">
-                <div class="line-step red"></div>
-            </div>
-            <div class="col-3">
-                <div class="line-step gray"></div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-12">
-                <h1>Номер телефона</h1>
-                <p>Введи номер телефона для авторизации</p>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-12">
-                <div class="input">
-                    <input
-                        class="tel"
-                        type="text"
-                        placeholder="+7 966 999 88 77"
-                    />
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-12 d-flex justify-content-center">
-                <nuxt-link to="load-photo" class="btn btn-send">
-                    Авторизация
-                </nuxt-link>
-            </div>
-        </div>
-    </div>
-</template>
+<template></template>
+<script>
+    import { TheMask } from "vue-the-mask";
+    export default {
+        components: { TheMask },
+    };
+</script>
 <style>
     @import url("https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap");
     @import url("https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400;1,500;1,700&display=swap");
@@ -132,7 +95,7 @@
         margin-right: 0;
     }
     .btn-send {
-        width: 90%;
+        width: 90% !important;
         max-width: 350px;
         margin-top: 97px;
         margin-bottom: 50px;

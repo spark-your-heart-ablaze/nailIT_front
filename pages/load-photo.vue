@@ -1,46 +1,4 @@
-<template>
-    <div class="container">
-        <div class="row photo">
-            <div class="col-12">
-                <nuxt-link to="salone-code" class="btn btn-back">
-                    <img src="images/back.png" alt="back" />
-                </nuxt-link>
-            </div>
-        </div>
-        <div class="row row-step">
-            <div class="col-12">
-                <div class="step">02</div>
-            </div>
-            <div class="col-6">
-                <div class="line-step red"></div>
-            </div>
-            <div class="col-6">
-                <div class="line-step gray"></div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-12">
-                <h1>Загрузка фотографии</h1>
-                <p>
-                    Пришли фотографию своей руки, чтобы начать примерку, как на
-                    фотографии выше
-                </p>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-12 d-flex justify-content-center">
-                <nuxt-link to="your-telephone" class="btn btn-send">
-                    Камера
-                </nuxt-link>
-                <input
-                    type="file"
-                    class="btn btn-send"
-                    accept="image/*;capture=camera"
-                />
-            </div>
-        </div>
-    </div>
-</template>
+<template></template>
 <style>
     @import url("https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap");
     @import url("https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400;1,500;1,700&display=swap");
@@ -116,7 +74,7 @@
         margin-top: 15px;
     }
     .btn-send {
-        width: 0%;
+        width: 90% !important;
         max-width: 350px;
         margin-top: 50px;
         margin-bottom: 50px;
