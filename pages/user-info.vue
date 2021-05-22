@@ -27,18 +27,20 @@
                 </div>
             </div>
             <div class="row">
-                <div class="col-12">
-                    <div class="input">
-                        <the-mask :mask="['#']" class="code" v-model="num1" />
-                        <the-mask :mask="['#']" class="code" v-model="num2" />
-                        <the-mask :mask="['#']" class="code" v-model="num3" />
-                        <the-mask :mask="['#']" class="code" v-model="num4" />
+                <div class="col-12 p-0">
+                    <div class="input-v">
+                        <the-mask
+                            :mask="[' # # # #']"
+                            class="code-v"
+                            v-model="num"
+                            @input="check"
+                        />
                     </div>
                 </div>
             </div>
             <div class="row">
                 <div class="col-12 d-flex justify-content-center">
-                    <a href="#" class="btn btn-send" @click="step = 2">
+                    <a href="#" class="btn btn-send" @click="sendCode">
                         Отправить
                     </a>
                 </div>
@@ -115,13 +117,16 @@
                             :mask="['+7 ### ### ## ##']"
                             class="tel"
                             placeholder="+7 966 999 88 77"
+                            v-model="phone"
                         />
                     </div>
                 </div>
             </div>
             <div class="row">
                 <div class="col-12 d-flex justify-content-center">
-                    <a href="#" class="btn btn-send"> Авторизация </a>
+                    <a href="#" class="btn btn-send" @click="sendPhone">
+                        Авторизация
+                    </a>
                 </div>
             </div>
         </div>
@@ -133,20 +138,53 @@
         components: { TheMask },
         data() {
             return {
-                num1: "",
-                num2: "",
-                num3: "",
-                num4: "",
-                step: 1,
+                num: "",
+                step: 3,
+                stemping: [],
+                phone: "",
             };
         },
-        computed: {
-            num: function () {
-                let code = this.num1 + this.num2 + this.num3 + this.num4;
-                return code;
-            },
-        },
         methods: {
+            sendPhone() {
+                let tel = "+7" + this.phone;
+                this.$axios
+                    .$post(
+                        `http://178.154.209.29:4343/add_to_csv?csv_parameter=${tel}`
+                    )
+                    .then((response) => {
+                        console;
+                    })
+                    .catch((err) => {
+                        this.$bvToast.toast("ошибка", {
+                            title: "Невозможно принять",
+                            variant: "danger",
+                            solid: true,
+                        });
+                    });
+            },
+            accept() {},
+            async sendCode() {
+                if (this.num.length == 4) {
+                    this.step = 2;
+                    console.log(this.num);
+                    this.stemping = await this.$axios.$get(
+                        `http://178.154.209.29:4343/download?salon_code=${this.num}`
+                    );
+                } else {
+                    alert("Введите код");
+                    this.num = "";
+                }
+                console.log(this.stemping);
+            },
+            check(event) {
+                console.log(event.key);
+                let input = document.querySelector(".code-v");
+                if (input) {
+                    if (event.length == 4) {
+                        input.blur();
+                    }
+                }
+            },
             send() {},
         },
     };
@@ -216,25 +254,29 @@
         opacity: 0.6;
         margin-top: 15px;
     }
-    .input {
+    .input-v {
         display: flex;
         justify-content: center;
         margin-top: 40px;
+        height: 70px;
     }
-    input.code {
-        width: 65px;
-        height: 65px;
-        background: #f8f3f3;
-        box-shadow: 0px 4px 4px rgba(205, 138, 154, 0.25),
-            0px 4px 4px rgba(0, 0, 0, 0.25), inset 4px 2px 6px #ebebeb,
-            inset 0px 2px 4px rgba(205, 138, 154, 0.3);
-        border-radius: 15px;
-        margin-right: 15px;
-        font-family: DM Sans;
+    input.code-v {
+        width: 380px;
+        height: 70px;
+        font-family: "DM Sans";
         font-size: 24px;
         line-height: 32px;
-        text-align: center;
-        color: #2e476e;
+        border: none;
+        background-color: transparent;
+        background-image: url("../static/images/Code-number.png");
+        background-position: center;
+        background-repeat: no-repeat;
+        text-align: left;
+        letter-spacing: 28px;
+        padding: 30px;
+        cursor: none;
+        color: transparent;
+        text-shadow: 0 0 0 #2e476e;
     }
     input:focus {
         outline: none;

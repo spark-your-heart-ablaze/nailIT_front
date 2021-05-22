@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "-": "0.0.1",
+    "@nuxtjs/axios": "^5.13.4",
     "axios": "^0.21.1",
     "bootstrap": "^4.6.0",
     "bootstrap-vue": "^2.21.2",

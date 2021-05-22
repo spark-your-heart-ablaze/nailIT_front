@@ -15,7 +15,7 @@
                 </div>
             </div>
             <div class="col-12 d-flex justify-content-center">
-                <nuxt-link to="salone-code" class="btn btn-start">
+                <nuxt-link to="user-info" class="btn btn-start">
                     Начать <img src="images/arrow.png" alt="" />
                 </nuxt-link>
             </div>
