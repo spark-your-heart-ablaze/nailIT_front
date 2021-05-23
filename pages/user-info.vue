@@ -79,11 +79,7 @@
                     <a href="#" class="btn btn-send" @click="step = 3">
                         Камера
                     </a>
-                    <input
-                        type="file"
-                        class="btn btn-send"
-                        accept="image/*;capture=camera"
-                    />
+                    <input type="file" accept="image/*" capture="camera" />
                 </div>
             </div>
         </div>
@@ -130,6 +126,37 @@
                 </div>
             </div>
         </div>
+        <div class="container choose-color" v-if="step == 4">
+            <div class="row photo">
+                <div class="col-12">
+                    <a href="#" @click="step = 1" class="btn btn-back">
+                        <img src="images/back.png" alt="back" />
+                    </a>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-4">
+                    <img src="images/filtr.png" alt="" /> Фильтр
+                </div>
+                <div class="col-4">{{ activeGroup }}</div>
+                <div class="col-4 d-flex justify-content-end">Скрыть</div>
+            </div>
+            <div class="row">
+                <div class="col-12 d-flex">
+                    <div class="template">
+                        <img src="images/none.png" alt="" />
+                    </div>
+                    <!-- <div
+                        class="template"
+                        v-for="(item, index) in stemping"
+                        :key="index"
+                    >
+                        <img :src="item.photo" alt="" />
+                    </div> -->
+                    {{ stemping[0] }}
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 <script>
@@ -139,9 +166,10 @@
         data() {
             return {
                 num: "",
-                step: 3,
+                step: 1,
                 stemping: [],
                 phone: "",
+                activeGroup: null,
             };
         },
         methods: {
@@ -152,14 +180,10 @@
                         `http://178.154.209.29:4343/add_to_csv?csv_parameter=${tel}`
                     )
                     .then((response) => {
-                        console;
+                        this.step = 4;
                     })
                     .catch((err) => {
-                        this.$bvToast.toast("ошибка", {
-                            title: "Невозможно принять",
-                            variant: "danger",
-                            solid: true,
-                        });
+                        alert("error");
                     });
             },
             accept() {},
@@ -174,10 +198,8 @@
                     alert("Введите код");
                     this.num = "";
                 }
-                console.log(this.stemping);
             },
             check(event) {
-                console.log(event.key);
                 let input = document.querySelector(".code-v");
                 if (input) {
                     if (event.length == 4) {
@@ -192,68 +214,7 @@
 <style>
     @import url("https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap");
     @import url("https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400;1,500;1,700&display=swap");
-    .btn-back {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-top: 50px;
-        width: 35px;
-        height: 35px;
-        border-radius: 50px;
-        background: #f8f3f3;
-        box-shadow: -7px -7px 12px rgba(255, 255, 255, 0.0155704),
-            -13px -7px 15px rgba(246, 251, 255, 0.741505),
-            -8px 5px 12px rgba(244, 248, 251, 0.345662),
-            2px 9px 30px rgba(201, 170, 170, 0.795345);
-    }
-    .step {
-        font-family: Lato;
-        font-style: normal;
-        font-weight: 500;
-        font-size: 16px;
-        line-height: 26px;
 
-        color: #653333;
-
-        mix-blend-mode: normal;
-        opacity: 0.3;
-        margin-top: 15px;
-    }
-    .line-step {
-        margin-top: 10px;
-        width: 100%;
-        height: 3px;
-    }
-    .red {
-        background: linear-gradient(
-            295.74deg,
-            rgba(205, 138, 154, 0.8) -52.26%,
-            rgba(254, 170, 160, 0.8) 118.91%
-        );
-        box-shadow: 12px 6px 40px rgba(255, 105, 169, 0.182009);
-    }
-    .gray {
-        background: rgba(110, 129, 160, 0.235905);
-        border-radius: 100px;
-    }
-    h1 {
-        font-family: Lato;
-        font-weight: bold;
-        font-size: 28px;
-        line-height: 32px;
-        text-align: center;
-        color: #334669;
-        margin-top: 26px;
-    }
-    p {
-        font-family: Lato;
-        font-size: 16px;
-        line-height: 24px;
-        text-align: center;
-        color: #334669;
-        opacity: 0.6;
-        margin-top: 15px;
-    }
     .input-v {
         display: flex;
         justify-content: center;
@@ -376,68 +337,6 @@
     }
     .btn:hover {
         color: #fff;
-    }
-    .btn-back {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-top: 50px;
-        width: 35px;
-        height: 35px;
-        border-radius: 50px;
-        background: #f8f3f3;
-        box-shadow: -7px -7px 12px rgba(255, 255, 255, 0.0155704),
-            -13px -7px 15px rgba(246, 251, 255, 0.741505),
-            -8px 5px 12px rgba(244, 248, 251, 0.345662),
-            2px 9px 30px rgba(201, 170, 170, 0.795345);
-    }
-    .step {
-        font-family: Lato;
-        font-style: normal;
-        font-weight: 500;
-        font-size: 16px;
-        line-height: 26px;
-
-        color: #653333;
-
-        mix-blend-mode: normal;
-        opacity: 0.3;
-        margin-top: 15px;
-    }
-    .line-step {
-        margin-top: 10px;
-        width: 100%;
-        height: 3px;
-    }
-    .red {
-        background: linear-gradient(
-            295.74deg,
-            rgba(205, 138, 154, 0.8) -52.26%,
-            rgba(254, 170, 160, 0.8) 118.91%
-        );
-        box-shadow: 12px 6px 40px rgba(255, 105, 169, 0.182009);
-    }
-    .gray {
-        background: rgba(110, 129, 160, 0.235905);
-        border-radius: 100px;
-    }
-    h1 {
-        font-family: Lato;
-        font-weight: bold;
-        font-size: 28px;
-        line-height: 32px;
-        text-align: center;
-        color: #334669;
-        margin-top: 26px;
-    }
-    p {
-        font-family: Lato;
-        font-size: 16px;
-        line-height: 24px;
-        text-align: center;
-        color: #334669;
-        opacity: 0.6;
-        margin-top: 15px;
     }
     input.tel {
         text-align: center;

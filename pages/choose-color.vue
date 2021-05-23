@@ -1,7 +1,34 @@
-<template></template>
+<template>
+    <div class="container choose-color">
+        <div class="row photo">
+            <div class="col-12">
+                <a href="#" @click="step = 1" class="btn btn-back">
+                    <img src="images/back.png" alt="back" />
+                </a>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-4">
+                <img src="images/filtr.png" alt="" /> Фильтр
+            </div>
+            <div class="col-4">{{ activeGroup }}</div>
+            <div class="col-4 d-flex justify-content-end">Скрыть</div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <div class="template"><img src="images/none.png" alt="" /></div>
+            </div>
+        </div>
+    </div>
+</template>
+<script>
+    export default {
+        data() {
+            return {};
+        },
+    };
+</script>
 <style>
-    @import url("https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap");
-    @import url("https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400;1,500;1,700&display=swap");
     .btn-back {
         display: flex;
         align-items: center;
