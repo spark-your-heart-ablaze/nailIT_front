@@ -79,7 +79,14 @@
                     <a href="#" class="btn btn-send" @click="step = 3">
                         Камера
                     </a>
-                    <input type="file" accept="image/*" capture="camera" />
+                    <input
+                        type="file"
+                        accept="image/x-png,image/gif,image/jpeg"
+                        capture="camera"
+                        class="btn btn-send"
+                        ref="file"
+                        @change="onFileChange"
+                    />
                 </div>
             </div>
         </div>
@@ -138,22 +145,66 @@
                 <div class="col-4">
                     <img src="images/filtr.png" alt="" /> Фильтр
                 </div>
-                <div class="col-4">{{ activeGroup }}</div>
+                <div
+                    class="col-4"
+                    v-if="activeWin == 2"
+                    style="text-align: center"
+                >
+                    Цвет
+                </div>
+                <div
+                    class="col-4"
+                    v-if="activeWin == 1"
+                    style="text-align: center"
+                >
+                    Стемпинг
+                </div>
                 <div class="col-4 d-flex justify-content-end">Скрыть</div>
             </div>
             <div class="row">
-                <div class="col-12 d-flex">
+                <div class="col-12 d-flex templates" v-if="activeWin == 1">
                     <div class="template">
                         <img src="images/none.png" alt="" />
                     </div>
-                    <!-- <div
+                    <div
                         class="template"
-                        v-for="(item, index) in stemping"
+                        v-for="(item, index) in stemp"
                         :key="index"
+                        :id="item['Номер пластины']"
+                        @click="idStemp = id"
                     >
-                        <img :src="item.photo" alt="" />
-                    </div> -->
-                    {{ stemping[0] }}
+                        <img :src="item['photo']" alt="" />
+                    </div>
+                </div>
+                <div class="col-12 d-flex templates" v-if="activeWin == 2">
+                    <div class="template">
+                        <img src="images/none.png" alt="" />
+                    </div>
+                    <div
+                        class="template"
+                        v-for="(item, index) in color"
+                        :key="index"
+                        :id="item['color code']"
+                        @click="idColor = id"
+                    >
+                        <img :src="item['photo']" alt="" />
+                    </div>
+                </div>
+                <div class="col-12">
+                    <div class="control">
+                        <div @click="activeWin = 2">
+                            <img src="images/rgb.png" alt="" />
+                            <p>Цвет</p>
+                        </div>
+                        <div>
+                            <img src="images/cam.png" alt="" />
+                            <p>Камера</p>
+                        </div>
+                        <div @click="activeWin = 1">
+                            <img src="images/stemp.png" alt="" />
+                            <p>Стемпинг</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -167,33 +218,63 @@
             return {
                 num: "",
                 step: 1,
-                stemping: [],
+                array: [],
+                ara: [{ ar: 1 }, { ar: 1 }],
                 phone: "",
                 activeGroup: null,
+                photo: null,
+                url: null,
+                file: "",
+                activeWin: 2,
+                idStemp: null,
+                idColor: null,
             };
+        },
+        computed: {
+            stemp() {
+                return this.array.filter((e) => {
+                    return e["Номер пластины"] != "none";
+                });
+            },
+            color() {
+                return this.array.filter((e) => {
+                    return e["color code"] != "none";
+                });
+            },
         },
         methods: {
             sendPhone() {
                 let tel = "+7" + this.phone;
-                this.$axios
-                    .$post(
-                        `http://178.154.209.29:4343/add_to_csv?csv_parameter=${tel}`
-                    )
-                    .then((response) => {
-                        this.step = 4;
-                    })
-                    .catch((err) => {
-                        alert("error");
-                    });
+                console.log(tel.length);
+                if (tel.length == 12) {
+                    this.$axios
+                        .$post(
+                            `http://178.154.209.29:4343/add_to_csv?csv_parameter=${tel}`
+                        )
+                        .then((response) => {
+                            this.step = 4;
+                        })
+                        .catch((err) => {
+                            alert("error");
+                        });
+                } else {
+                    alert("Введите корректный номер телефона");
+                }
             },
             accept() {},
-            async sendCode() {
+            sendCode() {
                 if (this.num.length == 4) {
                     this.step = 2;
                     console.log(this.num);
-                    this.stemping = await this.$axios.$get(
-                        `http://178.154.209.29:4343/download?salon_code=${this.num}`
-                    );
+                    // this.stemping = await
+                    this.$axios
+                        .$get(
+                            `http://178.154.209.29:4343/download?salon_code=${this.num}`
+                        )
+                        .then((response) => {
+                            this.array = Object.values(response);
+                            console.log(this.array);
+                        });
                 } else {
                     alert("Введите код");
                     this.num = "";
@@ -207,7 +288,27 @@
                     }
                 }
             },
-            send() {},
+            onFileChange(e) {
+                console.log(e);
+                const file = e.target.files[0];
+                this.url = URL.createObjectURL(file);
+                this.file = this.$refs.file.files[0];
+                console.log(this.url);
+                console.log(this.file);
+                let formData = new FormData();
+                formData.append("files", this.file);
+                console.log(formData);
+                this.$axios //отправка изображения на сервер
+                    .$post(
+                        `http://178.154.209.29:4343/prediction?Photo=${formData}`
+                    )
+                    .then((response) => {
+                        this.step = 3;
+                    })
+                    .catch((err) => {
+                        alert("error");
+                    });
+            },
         },
     };
 </script>
@@ -361,5 +462,39 @@
     }
     input[type="text"]:last-child {
         margin-right: 0;
+    }
+    .templates {
+        justify-content: space-between;
+        flex-wrap: wrap;
+        margin-bottom: 104px;
+    }
+    .template img {
+        width: 60px;
+        height: 60px;
+    }
+    .template {
+        width: 60px;
+        height: 60px;
+        margin-bottom: 9px;
+    }
+    #file-upload-button {
+        background: transparent;
+    }
+    input[type="file"] {
+        background: transparent;
+    }
+    .control {
+        position: fixed;
+        bottom: 0px;
+        background: #f8f3f3;
+        width: 100vw;
+        height: 104px;
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        left: 0;
+    }
+    .control div {
+        text-align: center;
     }
 </style>
