@@ -85,8 +85,10 @@
                         capture="camera"
                         class="btn btn-send"
                         ref="file"
+                        id="photo"
                         @change="onFileChange"
                     />
+                    <canvas id="canvas" style="display: none" />
                 </div>
             </div>
         </div>
@@ -135,14 +137,25 @@
         </div>
         <div class="container choose-color" v-if="step == 4">
             <div class="row photo">
-                <div class="col-12">
-                    <a href="#" @click="step = 1" class="btn btn-back">
-                        <img src="images/back.png" alt="back" />
-                    </a>
+                <div class="col-12 pl-0 pr-0">
+                    <div
+                        class="btn-group d-flex justify-content-between align-items-center"
+                    >
+                        <div>
+                            <a href="#" @click="step = 1" class="btn btn-back">
+                                <img src="images/back.png" alt="back" />
+                            </a>
+                        </div>
+                        <div>
+                            <a href.prevent class="btn btn-back">
+                                <img src="images/save.svg" alt="save"
+                            /></a>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="row">
-                <div class="col-4">
+            <div class="row setting">
+                <div class="col-4" style="text-align: left">
                     <img src="images/filtr.png" alt="" /> Фильтр
                 </div>
                 <div
@@ -150,16 +163,21 @@
                     v-if="activeWin == 2"
                     style="text-align: center"
                 >
-                    Цвет
+                    <span> Цвет</span>
                 </div>
                 <div
                     class="col-4"
                     v-if="activeWin == 1"
                     style="text-align: center"
                 >
-                    Стемпинг
+                    <span>Стемпинг</span>
                 </div>
-                <div class="col-4 d-flex justify-content-end">Скрыть</div>
+                <div
+                    class="col-4 d-flex justify-content-end"
+                    style="text-align: "
+                >
+                    Скрыть
+                </div>
             </div>
             <div class="row">
                 <div class="col-12 d-flex templates" v-if="activeWin == 1">
@@ -273,7 +291,6 @@
                         )
                         .then((response) => {
                             this.array = Object.values(response);
-                            console.log(this.array);
                         });
                 } else {
                     alert("Введите код");
@@ -289,24 +306,28 @@
                 }
             },
             onFileChange(e) {
-                console.log(e);
-                const file = e.target.files[0];
-                this.url = URL.createObjectURL(file);
-                this.file = this.$refs.file.files[0];
-                console.log(this.url);
-                console.log(this.file);
-                let formData = new FormData();
-                formData.append("files", this.file);
-                console.log(formData);
+                var input = document.getElementById("photo"),
+                    canvas = document.getElementById("canvas");
+                var file = input.files[0];
+                var img = document.createElement("img");
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+                var ctx = canvas.getContext("2d");
+                ctx.drawImage(img, 0, 0);
+                var dataurl = canvas.toDataURL("image/jpeg", 0.5);
+                console.log(dataurl);
+
                 this.$axios //отправка изображения на сервер
-                    .$post(
-                        `http://178.154.209.29:4343/prediction?Photo=${formData}`
-                    )
+                    .$post(`http://178.154.209.29:4343/prediction?Photo=${dataurl}`)
                     .then((response) => {
                         this.step = 3;
                     })
                     .catch((err) => {
                         alert("error");
+                        this.step = 3;
                     });
             },
         },
@@ -496,5 +517,43 @@
     }
     .control div {
         text-align: center;
+    }
+    #photo {
+        position: absolute;
+        opacity: 0;
+    }
+    .setting {
+        font-family: Lato;
+        font-style: normal;
+        font-weight: bold;
+        font-size: 16px;
+        line-height: 24px;
+        /* identical to box height, or 171% */
+
+        color: #334669;
+
+        mix-blend-mode: normal;
+    }
+    .setting span {
+        font-family: Lato;
+        font-style: normal;
+        font-weight: bold;
+        font-size: 14px;
+        line-height: 24px;
+        /* identical to box height, or 240% */
+
+        text-align: center;
+
+        color: #1e2a41;
+
+        mix-blend-mode: normal;
+    }
+    .btn-group {
+        background: #f8f3f3;
+        width: 100%;
+        height: 70px;
+    }
+    .btn-group .btn-back {
+        margin: 15px;
     }
 </style>
