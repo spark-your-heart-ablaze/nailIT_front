@@ -136,7 +136,7 @@
             </div>
         </div>
         <div class="container choose-color" v-if="step == 4">
-            <div class="row photo">
+            <div class="row">
                 <div class="col-12 pl-0 pr-0">
                     <div
                         class="btn-group d-flex justify-content-between align-items-center"
@@ -152,6 +152,11 @@
                             /></a>
                         </div>
                     </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12 pl-0 pr-0">
+                    <img src="/images/hand.jpg" alt="" />
                 </div>
             </div>
             <div class="row setting">
@@ -189,7 +194,7 @@
                         v-for="(item, index) in stemp"
                         :key="index"
                         :id="item['Номер пластины']"
-                        @click="idStemp = id"
+                        @click="getStemp(item['Номер пластины'])"
                     >
                         <img :src="item['photo']" alt="" />
                     </div>
@@ -203,7 +208,7 @@
                         v-for="(item, index) in color"
                         :key="index"
                         :id="item['color code']"
-                        @click="idColor = id"
+                        @click="getColor(item['color code'])"
                     >
                         <img :src="item['photo']" alt="" />
                     </div>
@@ -241,7 +246,7 @@
                 phone: "",
                 activeGroup: null,
                 photo: null,
-                url: null,
+                url: "",
                 file: "",
                 activeWin: 2,
                 idStemp: null,
@@ -261,9 +266,29 @@
             },
         },
         methods: {
+            getStemp(id) {
+                console.log(id);
+                this.$axios
+                    .$get(
+                        `http://178.154.209.29:4343/equip_stamp?photo_name=%D1%86%D1%83%D0%BA%D0%BA&stamping_condition=0&color_condition=1&stamping=${id}'`
+                    )
+                    .then((response) => {
+                        this.url = response;
+                    });
+            },
+            getColor(id) {
+                console.log(id);
+                this.$axios
+                    .$get(
+                        `http://178.154.209.29:4343/equip?photo_name=rewr&stamping_condition=0&color_condition=0&color=${id}`
+                    )
+                    .then((response) => {
+                        this.url = response;
+                    });
+            },
             sendPhone() {
                 let tel = "+7" + this.phone;
-                console.log(tel.length);
+                console.log("telephone");
                 if (tel.length == 12) {
                     this.$axios
                         .$post(
@@ -283,7 +308,6 @@
             sendCode() {
                 if (this.num.length == 4) {
                     this.step = 2;
-                    console.log(this.num);
                     // this.stemping = await
                     this.$axios
                         .$get(
@@ -306,22 +330,20 @@
                 }
             },
             onFileChange(e) {
-                var input = document.getElementById("photo"),
-                    canvas = document.getElementById("canvas");
-                var file = input.files[0];
-                var img = document.createElement("img");
-                var reader = new FileReader();
-                reader.onload = function (e) {
-                    img.src = e.target.result;
-                };
-                reader.readAsDataURL(file);
-                var ctx = canvas.getContext("2d");
-                ctx.drawImage(img, 0, 0);
-                var dataurl = canvas.toDataURL("image/jpeg", 0.5);
-                console.log(dataurl);
-
+                const file = e.target.files[0];
+                this.url = URL.createObjectURL(file);
+                // if (e.target.files[0].size > 5000000) {
+                //     alert("File is too big!");
+                //     this.$refs.file.value = null;
+                // }
+                this.file = this.$refs.file.files[0];
+                let formData = new FormData();
+                formData.append("files", this.file);
+                console.log(formData);
                 this.$axios //отправка изображения на сервер
-                    .$post(`http://178.154.209.29:4343/prediction?Photo=${dataurl}`)
+                    .$post(
+                        `http://178.154.209.29:4343/prediction?Photo=${formData}`
+                    )
                     .then((response) => {
                         this.step = 3;
                     })
