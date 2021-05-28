@@ -341,9 +341,7 @@
                 formData.append("files", this.file);
                 console.log(formData);
                 this.$axios //отправка изображения на сервер
-                    .$post(
-                        `http://178.154.209.29:4343/prediction?Photo=${formData}`
-                    )
+                    .$post(`http://178.154.209.29:4343/prediction`, formData)
                     .then((response) => {
                         this.step = 3;
                     })
