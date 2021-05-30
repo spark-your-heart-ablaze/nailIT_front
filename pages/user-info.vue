@@ -155,8 +155,8 @@
                 </div>
             </div>
             <div class="row">
-                <div class="col-12 pl-0 pr-0">
-                    <img src="/images/hand.jpg" alt="" />
+                <div class="imgbox">
+                    <img class="center-fit" id="myImage" src="" alt="" />
                 </div>
             </div>
             <div class="row setting">
@@ -208,7 +208,7 @@
                         v-for="(item, index) in color"
                         :key="index"
                         :id="item['color code']"
-                        @click="getColor(item['color code'])"
+                        @click="getColor(item['🔒 Row ID'])"
                     >
                         <img :src="item['photo']" alt="" />
                     </div>
@@ -235,6 +235,7 @@
 </template>
 <script>
     import { TheMask } from "vue-the-mask";
+    import axios from "axios";
     export default {
         components: { TheMask },
         data() {
@@ -251,6 +252,9 @@
                 activeWin: 2,
                 idStemp: null,
                 idColor: null,
+                photo_name: null,
+                color_condition: 0,
+                stamping_condition: 0,
             };
         },
         computed: {
@@ -270,20 +274,24 @@
                 console.log(id);
                 this.$axios
                     .$get(
-                        `http://178.154.209.29:4343/equip_stamp?photo_name=%D1%86%D1%83%D0%BA%D0%BA&stamping_condition=0&color_condition=1&stamping=${id}'`
+                        `/equip_stamp?photo_name=${this.photo_name}&stamping_condition=${this.stamping_condition}&color_condition=${this.color_condition}&stamping=${id}'`
                     )
                     .then((response) => {
+                        this.stamping_condition = 1;
                         this.url = response;
+                        document.getElementById('myImage').src=this.url;
                     });
             },
             getColor(id) {
                 console.log(id);
                 this.$axios
                     .$get(
-                        `http://178.154.209.29:4343/equip?photo_name=rewr&stamping_condition=0&color_condition=0&color=${id}`
+                        `/equip?photo_name=${this.photo_name}&stamping_condition=${this.stamping_condition}&color_condition=${this.color_condition}&color=${id}`
                     )
                     .then((response) => {
+                        this.color_condition = 1;
                         this.url = response;
+                        document.getElementById('myImage').src=this.url;
                     });
             },
             sendPhone() {
@@ -292,13 +300,19 @@
                 if (tel.length == 12) {
                     this.$axios
                         .$post(
-                            `http://178.154.209.29:4343/add_to_csv?csv_parameter=${tel}`
+                            `/add_to_csv?csv_parameter=${tel}`
                         )
                         .then((response) => {
                             this.step = 4;
+                            var vm = this;
+                          setTimeout(function(){
+                              console.log(vm.url);
+                              console.log(vm.phone);
+                              document.getElementById('myImage').src=vm.url;
+                            }, 1000);
                         })
                         .catch((err) => {
-                            alert("error");
+                            alert(err);
                         });
                 } else {
                     alert("Введите корректный номер телефона");
@@ -311,7 +325,7 @@
                     // this.stemping = await
                     this.$axios
                         .$get(
-                            `http://178.154.209.29:4343/download?salon_code=${this.num}`
+                            `/download?salon_code=${this.num}`
                         )
                         .then((response) => {
                             this.array = Object.values(response);
@@ -329,26 +343,29 @@
                     }
                 }
             },
-            onFileChange(e) {
-                const file = e.target.files[0];
-                this.url = URL.createObjectURL(file);
-                // if (e.target.files[0].size > 5000000) {
-                //     alert("File is too big!");
-                //     this.$refs.file.value = null;
-                // }
-                this.file = this.$refs.file.files[0];
-                let formData = new FormData();
-                formData.append("files", this.file);
-                console.log(formData);
-                this.$axios //отправка изображения на сервер
-                    .$post(`http://178.154.209.29:4343/prediction`, formData)
-                    .then((response) => {
-                        this.step = 3;
-                    })
-                    .catch((err) => {
-                        alert("error");
-                        this.step = 3;
-                    });
+          onFileChange(e) {
+            //const file = e.target.files[0];
+            //this.url = URL.createObjectURL(file);
+            // if (e.target.files[0].size > 5000000) {
+            //     alert("File is too big!");
+            //     this.$refs.file.value = null;
+            // }
+            this.photo_name = Math.random().toString(36).substr(2, 9);
+            this.file = this.$refs.file.files[0];
+            let formData = new FormData();
+            formData.append("Photo", this.file);
+            console.log(formData);
+            this.step = 3;
+            this.$axios //отправка изображения на сервер
+              .$post(`/prediction?name=${this.photo_name}`, formData)
+              .then((response) => {
+                this.url = response;
+                console.log(this.url);
+              })
+              .catch((err) => {
+                alert("error");
+                this.step = 3;
+              });
             },
         },
     };
@@ -575,5 +592,15 @@
     }
     .btn-group .btn-back {
         margin: 15px;
+    }
+    .imgbox {
+      height: 80%;
+    }
+    .center-fit {
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+      width: 50%;
+      max-height: 80vh;
     }
 </style>
