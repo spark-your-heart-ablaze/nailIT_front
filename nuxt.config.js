@@ -39,7 +39,7 @@ export default {
   axios: {
     // extra config e.gbaseURL: process.env.API_URL,
     // BaseURL: 'https://link-to-API'
-    baseURL: 'http://178.154.209.29:4343',
+    baseURL: 'https://cg.msk.ru/',
   },
   // Build Configuration: https://go.nuxtjs.dev/config-build
   build: {
