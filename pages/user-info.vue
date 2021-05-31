@@ -147,7 +147,12 @@
                             </a>
                         </div>
                         <div>
-                            <a href.prevent class="btn btn-back">
+                            <a
+                                href=""
+                                download
+                                class="btn btn-back"
+                                id="link-download"
+                            >
                                 <img src="images/save.svg" alt="save"
                             /></a>
                         </div>
@@ -155,64 +160,78 @@
                 </div>
             </div>
             <div class="row">
-                <div class="col-12 pl-0 pr-0">
-                    <img src="/images/hand.jpg" alt="" />
+                <div class="imgbox">
+                    <img class="center-fit" id="myImage" src="" alt="" />
                 </div>
             </div>
-            <div class="row setting">
-                <div class="col-4" style="text-align: left">
-                    <img src="images/filtr.png" alt="" /> Фильтр
+            <div class="setting col-12" :class="{ 'hide-sett': closeSetting }">
+                <div class="row">
+                    <div class="col-4" style="text-align: left">
+                        <img src="images/filtr.png" alt="" /> Фильтр
+                    </div>
+                    <div
+                        class="col-4"
+                        v-if="activeWin == 2"
+                        style="text-align: center"
+                    >
+                        <span> Цвет</span>
+                    </div>
+                    <div
+                        class="col-4"
+                        v-if="activeWin == 1"
+                        style="text-align: center"
+                    >
+                        <span>Стемпинг</span>
+                    </div>
+                    <div
+                        class="col-4 d-flex justify-content-end"
+                        style="text-align: "
+                        @click="closeSetting = !closeSetting"
+                        v-if="!closeSetting"
+                    >
+                        Скрыть
+                    </div>
+                    <div
+                        class="col-4 d-flex justify-content-end"
+                        style="text-align: "
+                        @click="closeSetting = !closeSetting"
+                        v-if="closeSetting"
+                    >
+                        Раскрыть
+                    </div>
                 </div>
-                <div
-                    class="col-4"
-                    v-if="activeWin == 2"
-                    style="text-align: center"
-                >
-                    <span> Цвет</span>
-                </div>
-                <div
-                    class="col-4"
-                    v-if="activeWin == 1"
-                    style="text-align: center"
-                >
-                    <span>Стемпинг</span>
-                </div>
-                <div
-                    class="col-4 d-flex justify-content-end"
-                    style="text-align: "
-                >
-                    Скрыть
+                <div class="row">
+                    <div class="col-12 d-flex templates" v-if="activeWin == 1">
+                        <div class="template">
+                            <img src="images/none.png" alt="" />
+                        </div>
+                        <div
+                            class="template"
+                            v-for="(item, index) in stemp"
+                            :key="index"
+                            :id="item['Номер пластины']"
+                            @click="getStemp(item['Номер пластины'])"
+                        >
+                            <img :src="item['photo']" alt="" />
+                        </div>
+                    </div>
+                    <div class="col-12 d-flex templates" v-if="activeWin == 2">
+                        <div class="template">
+                            <img src="images/none.png" alt="" />
+                        </div>
+                        <div
+                            class="template"
+                            v-for="(item, index) in color"
+                            :key="index"
+                            :id="item['color code']"
+                            @click="getColor(item['🔒 Row ID'])"
+                        >
+                            <img :src="item['photo']" alt="" />
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="row">
-                <div class="col-12 d-flex templates" v-if="activeWin == 1">
-                    <div class="template">
-                        <img src="images/none.png" alt="" />
-                    </div>
-                    <div
-                        class="template"
-                        v-for="(item, index) in stemp"
-                        :key="index"
-                        :id="item['Номер пластины']"
-                        @click="getStemp(item['Номер пластины'])"
-                    >
-                        <img :src="item['photo']" alt="" />
-                    </div>
-                </div>
-                <div class="col-12 d-flex templates" v-if="activeWin == 2">
-                    <div class="template">
-                        <img src="images/none.png" alt="" />
-                    </div>
-                    <div
-                        class="template"
-                        v-for="(item, index) in color"
-                        :key="index"
-                        :id="item['color code']"
-                        @click="getColor(item['color code'])"
-                    >
-                        <img :src="item['photo']" alt="" />
-                    </div>
-                </div>
                 <div class="col-12">
                     <div class="control">
                         <div @click="activeWin = 2">
@@ -235,6 +254,7 @@
 </template>
 <script>
     import { TheMask } from "vue-the-mask";
+    import axios from "axios";
     export default {
         components: { TheMask },
         data() {
@@ -251,6 +271,10 @@
                 activeWin: 2,
                 idStemp: null,
                 idColor: null,
+                photo_name: null,
+                color_condition: 0,
+                stamping_condition: 0,
+                closeSetting: false,
             };
         },
         computed: {
@@ -270,20 +294,26 @@
                 console.log(id);
                 this.$axios
                     .$get(
-                        `http://178.154.209.29:4343/equip_stamp?photo_name=%D1%86%D1%83%D0%BA%D0%BA&stamping_condition=0&color_condition=1&stamping=${id}'`
+                        `/equip_stamp?photo_name=${this.photo_name}&stamping_condition=${this.stamping_condition}&color_condition=${this.color_condition}&stamping=${id}'`
                     )
                     .then((response) => {
+                        this.stamping_condition = 1;
                         this.url = response;
+                        document.getElementById("myImage").src = this.url;
+                        document.getElementById("link-download").href = this.url;
                     });
             },
             getColor(id) {
                 console.log(id);
                 this.$axios
                     .$get(
-                        `http://178.154.209.29:4343/equip?photo_name=rewr&stamping_condition=0&color_condition=0&color=${id}`
+                        `/equip?photo_name=${this.photo_name}&stamping_condition=${this.stamping_condition}&color_condition=${this.color_condition}&color=${id}`
                     )
                     .then((response) => {
+                        this.color_condition = 1;
                         this.url = response;
+                        document.getElementById("myImage").src = this.url;
+                        document.getElementById("link-download").href = this.url;
                     });
             },
             sendPhone() {
@@ -291,14 +321,20 @@
                 console.log("telephone");
                 if (tel.length == 12) {
                     this.$axios
-                        .$post(
-                            `http://178.154.209.29:4343/add_to_csv?csv_parameter=${tel}`
-                        )
+                        .$post(`/add_to_csv?csv_parameter=${tel}`)
                         .then((response) => {
                             this.step = 4;
+                            var vm = this;
+                            setTimeout(function () {
+                                console.log(vm.url);
+                                console.log(vm.phone);
+                                document.getElementById("myImage").src = vm.url;
+                                document.getElementById("link-download").href =
+                                    vm.url;
+                            }, 1000);
                         })
                         .catch((err) => {
-                            alert("error");
+                            alert(err);
                         });
                 } else {
                     alert("Введите корректный номер телефона");
@@ -310,9 +346,7 @@
                     this.step = 2;
                     // this.stemping = await
                     this.$axios
-                        .$get(
-                            `http://178.154.209.29:4343/download?salon_code=${this.num}`
-                        )
+                        .$get(`/download?salon_code=${this.num}`)
                         .then((response) => {
                             this.array = Object.values(response);
                         });
@@ -330,20 +364,23 @@
                 }
             },
             onFileChange(e) {
-                const file = e.target.files[0];
-                this.url = URL.createObjectURL(file);
+                //const file = e.target.files[0];
+                //this.url = URL.createObjectURL(file);
                 // if (e.target.files[0].size > 5000000) {
                 //     alert("File is too big!");
                 //     this.$refs.file.value = null;
                 // }
+                this.photo_name = Math.random().toString(36).substr(2, 9);
                 this.file = this.$refs.file.files[0];
                 let formData = new FormData();
-                formData.append("files", this.file);
+                formData.append("Photo", this.file);
                 console.log(formData);
+                this.step = 3;
                 this.$axios //отправка изображения на сервер
-                    .$post(`http://178.154.209.29:4343/prediction`, formData)
+                    .$post(`/prediction?name=${this.photo_name}`, formData)
                     .then((response) => {
-                        this.step = 3;
+                        this.url = response;
+                        console.log(this.url);
                     })
                     .catch((err) => {
                         alert("error");
@@ -507,7 +544,10 @@
     .templates {
         justify-content: space-between;
         flex-wrap: wrap;
-        margin-bottom: 104px;
+        padding-bottom: 460px;
+        position: fixed;
+        height: 100%;
+        overflow: auto;
     }
     .template img {
         width: 60px;
@@ -553,6 +593,17 @@
         color: #334669;
 
         mix-blend-mode: normal;
+        position: fixed;
+        left: 0;
+        top: calc(100vh - 329px);
+        height: 100%;
+        overflow: auto;
+        background: #f8f3f3;
+        border-radius: 30px;
+        transition: all 0.5s ease-in-out;
+    }
+    .hide-sett {
+        top: calc(100vh - 190px) !important;
     }
     .setting span {
         font-family: Lato;
@@ -575,5 +626,13 @@
     }
     .btn-group .btn-back {
         margin: 15px;
+    }
+    .imgbox {
+        height: 80%;
+    }
+    .center-fit {
+        display: block;
+        width: 100%;
+        max-height: 80vh;
     }
 </style>
