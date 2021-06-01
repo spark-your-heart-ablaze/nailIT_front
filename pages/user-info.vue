@@ -1,5 +1,8 @@
 <template>
     <div class="nail-it">
+        <div class="loading" v-if="load">
+            <img src="/images/loading.png" alt="" class="load-img" />
+        </div>
         <div class="container salone-code" v-if="step == 1">
             <div class="row">
                 <div class="col-12">
@@ -202,7 +205,7 @@
                 </div>
                 <div class="row">
                     <div class="col-12 d-flex templates" v-if="activeWin == 1">
-                        <div class="template">
+                        <div class="template" @click="clearPhoto">
                             <img src="images/none.png" alt="" />
                         </div>
                         <div
@@ -216,7 +219,7 @@
                         </div>
                     </div>
                     <div class="col-12 d-flex templates" v-if="activeWin == 2">
-                        <div class="template">
+                        <div class="template" @click="clearPhoto">
                             <img src="images/none.png" alt="" />
                         </div>
                         <div
@@ -275,6 +278,8 @@
                 color_condition: 0,
                 stamping_condition: 0,
                 closeSetting: false,
+                photoNone: "",
+                load: false,
             };
         },
         computed: {
@@ -290,6 +295,10 @@
             },
         },
         methods: {
+            clearPhoto() {
+                console.log(this.photoNone);
+                document.getElementById("myImage").src = this.photoNone;
+            },
             getStemp(id) {
                 console.log(id);
                 this.$axios
@@ -319,15 +328,15 @@
             sendPhone() {
                 let tel = "+7" + this.phone;
                 console.log("telephone");
+                this.load = true;
                 if (tel.length == 12) {
                     this.$axios
                         .$post(`/add_to_csv?csv_parameter=${tel}`)
                         .then((response) => {
                             this.step = 4;
                             var vm = this;
+                            this.load = false;
                             setTimeout(function () {
-                                console.log(vm.url);
-                                console.log(vm.phone);
                                 document.getElementById("myImage").src = vm.url;
                                 document.getElementById("link-download").href =
                                     vm.url;
@@ -340,7 +349,6 @@
                     alert("Введите корректный номер телефона");
                 }
             },
-            accept() {},
             sendCode() {
                 if (this.num.length == 4) {
                     this.step = 2;
@@ -364,12 +372,6 @@
                 }
             },
             onFileChange(e) {
-                //const file = e.target.files[0];
-                //this.url = URL.createObjectURL(file);
-                // if (e.target.files[0].size > 5000000) {
-                //     alert("File is too big!");
-                //     this.$refs.file.value = null;
-                // }
                 this.photo_name = Math.random().toString(36).substr(2, 9);
                 this.file = this.$refs.file.files[0];
                 let formData = new FormData();
@@ -380,7 +382,7 @@
                     .$post(`/prediction?name=${this.photo_name}`, formData)
                     .then((response) => {
                         this.url = response;
-                        console.log(this.url);
+                        this.photoNone = response;
                     })
                     .catch((err) => {
                         alert("error");
@@ -412,11 +414,16 @@
         background-position: center;
         background-repeat: no-repeat;
         text-align: left;
-        letter-spacing: 28px;
+        letter-spacing: 30px;
         padding: 30px;
         cursor: none;
         color: transparent;
         text-shadow: 0 0 0 #2e476e;
+    }
+    @media (max-width: 370px) {
+        input.code-v {
+            padding: 15px;
+        }
     }
     input:focus {
         outline: none;
@@ -557,6 +564,7 @@
         width: 60px;
         height: 60px;
         margin-bottom: 9px;
+        touch-action: none;
     }
     #file-upload-button {
         background: transparent;
@@ -634,5 +642,44 @@
         display: block;
         width: 100%;
         max-height: 80vh;
+        transform: rotate(90deg);
+    }
+    .choose-color {
+        height: 100%;
+        max-height: 100%;
+        max-width: 100%;
+    }
+    .loading {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        z-index: 1000;
+        background: rgba(145, 144, 144, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .load-img {
+        width: 70px;
+        height: 70px;
+        opacity: 1;
+        animation: 3s linear 0s normal none infinite running rot;
+        -webkit-animation: 3s linear 0s normal none infinite running rot;
+    }
+    @keyframes rot {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+    @-webkit-keyframes rot {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(360deg);
+        }
     }
 </style>
