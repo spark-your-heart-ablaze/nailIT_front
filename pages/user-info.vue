@@ -642,7 +642,6 @@
         display: block;
         width: 100%;
         max-height: 80vh;
-        transform: rotate(90deg);
     }
     .choose-color {
         height: 100%;
