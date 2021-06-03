@@ -167,27 +167,30 @@
                     <img class="center-fit" id="myImage" src="" alt="" />
                 </div>
             </div>
-            <div class="setting col-12" :class="{ 'hide-sett': closeSetting }">
-                <div class="row">
-                    <div class="col-4" style="text-align: left">
+            <div class="setting">
+                <div
+                    class="row templates"
+                    :class="{ 'hide-sett': closeSetting }"
+                >
+                    <div class="col-4 pt-2 pb-2" style="text-align: left">
                         <img src="images/filtr.png" alt="" /> Фильтр
                     </div>
                     <div
-                        class="col-4"
+                        class="col-4 pt-2 pb-2"
                         v-if="activeWin == 2"
                         style="text-align: center"
                     >
                         <span> Цвет</span>
                     </div>
                     <div
-                        class="col-4"
+                        class="col-4 pt-2 pb-2"
                         v-if="activeWin == 1"
                         style="text-align: center"
                     >
                         <span>Стемпинг</span>
                     </div>
                     <div
-                        class="col-4 d-flex justify-content-end"
+                        class="col-4 d-flex justify-content-end pt-2 pb-2"
                         style="text-align: "
                         @click="closeSetting = !closeSetting"
                         v-if="!closeSetting"
@@ -195,16 +198,15 @@
                         Скрыть
                     </div>
                     <div
-                        class="col-4 d-flex justify-content-end"
+                        class="col-4 d-flex justify-content-end pt-2 pb-2"
                         style="text-align: "
                         @click="closeSetting = !closeSetting"
                         v-if="closeSetting"
                     >
                         Раскрыть
                     </div>
-                </div>
-                <div class="row">
-                    <div class="col-12 d-flex templates" v-if="activeWin == 1">
+
+                    <div class="col-12 d-flex temp" v-if="activeWin == 1">
                         <div class="template" @click="clearPhoto">
                             <img src="images/none.png" alt="" />
                         </div>
@@ -218,7 +220,7 @@
                             <img :src="item['photo']" alt="" />
                         </div>
                     </div>
-                    <div class="col-12 d-flex templates" v-if="activeWin == 2">
+                    <div class="col-12 d-flex temp" v-if="activeWin == 2">
                         <div class="template" @click="clearPhoto">
                             <img src="images/none.png" alt="" />
                         </div>
@@ -241,9 +243,18 @@
                             <img src="images/rgb.png" alt="" />
                             <p>Цвет</p>
                         </div>
-                        <div>
+                        <div style="position: relative">
                             <img src="images/cam.png" alt="" />
                             <p>Камера</p>
+                            <input
+                                type="file"
+                                accept="image/x-png,image/gif,image/jpeg"
+                                capture="camera"
+                                ref="file"
+                                id="photo"
+                                class="btn-cam"
+                                @change="onFileChangeNew"
+                            />
                         </div>
                         <div @click="activeWin = 1">
                             <img src="images/stemp.png" alt="" />
@@ -344,9 +355,11 @@
                         })
                         .catch((err) => {
                             alert(err);
+                            this.load = false;
                         });
                 } else {
                     alert("Введите корректный номер телефона");
+                    this.load = false;
                 }
             },
             sendCode() {
@@ -389,6 +402,27 @@
                         this.step = 3;
                     });
             },
+            onFileChangeNew(e) {
+                this.photo_name = Math.random().toString(36).substr(2, 9);
+                this.file = this.$refs.file.files[0];
+                let formData = new FormData();
+                formData.append("Photo", this.file);
+                console.log(formData);
+                this.load = true;
+                this.$axios //отправка изображения на сервер
+                    .$post(`/prediction?name=${this.photo_name}`, formData)
+                    .then((response) => {
+                        this.url = response;
+                        this.photoNone = response;
+                        document.getElementById("myImage").src = this.url;
+                        document.getElementById("link-download").href = this.url;
+                        this.load = false;
+                    })
+                    .catch((err) => {
+                        alert("error");
+                        this.load = false;
+                    });
+            },
         },
     };
 </script>
@@ -419,6 +453,7 @@
         cursor: none;
         color: transparent;
         text-shadow: 0 0 0 #2e476e;
+        caret-color: transparent;
     }
     @media (max-width: 370px) {
         input.code-v {
@@ -549,21 +584,37 @@
         margin-right: 0;
     }
     .templates {
-        justify-content: space-between;
-        flex-wrap: wrap;
-        padding-bottom: 460px;
         position: fixed;
         height: 100%;
         overflow: auto;
+        max-height: 245px;
+        bottom: 104px;
+        background: #ffffff;
+        font-family: Lato;
+        font-style: normal;
+        font-weight: bold;
+        font-size: 16px;
+        line-height: 24px;
+        color: #334669;
+        overflow: auto;
+        border-top-left-radius: 30px;
+        border-top-right-radius: 30px;
+        transition: all 0.5s ease-in-out;
     }
-    .template img {
+    .temp {
+        justify-content: space-between;
+        flex-wrap: wrap;
+    }
+    .temp img {
         width: 60px;
         height: 60px;
+        /* touch-action: none; */
     }
     .template {
         width: 60px;
         height: 60px;
         margin-bottom: 9px;
+        margin-right: 5px;
         touch-action: none;
     }
     #file-upload-button {
@@ -576,6 +627,7 @@
         position: fixed;
         bottom: 0px;
         background: #f8f3f3;
+        box-shadow: 25px 28px 66px;
         width: 100vw;
         height: 104px;
         display: flex;
@@ -590,28 +642,8 @@
         position: absolute;
         opacity: 0;
     }
-    .setting {
-        font-family: Lato;
-        font-style: normal;
-        font-weight: bold;
-        font-size: 16px;
-        line-height: 24px;
-        /* identical to box height, or 171% */
-
-        color: #334669;
-
-        mix-blend-mode: normal;
-        position: fixed;
-        left: 0;
-        top: calc(100vh - 329px);
-        height: 100%;
-        overflow: auto;
-        background: #f8f3f3;
-        border-radius: 30px;
-        transition: all 0.5s ease-in-out;
-    }
     .hide-sett {
-        top: calc(100vh - 190px) !important;
+        max-height: 105px;
     }
     .setting span {
         font-family: Lato;
@@ -665,6 +697,12 @@
         opacity: 1;
         animation: 3s linear 0s normal none infinite running rot;
         -webkit-animation: 3s linear 0s normal none infinite running rot;
+    }
+    .btn-cam {
+        width: 100%;
+        height: 100%;
+        left: 0;
+        top: 0;
     }
     @keyframes rot {
         0% {
