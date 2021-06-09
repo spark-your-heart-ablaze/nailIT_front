@@ -306,7 +306,7 @@
                             v-for="(item, index) in stemp"
                             :key="index"
                             :id="item['Номер пластины']"
-                            @click="getStemp(item['Номер пластины'])"
+                            @click="getStemp(item['photo'])"
                         >
                             <img :src="item['photo']" alt="" />
                         </div>
