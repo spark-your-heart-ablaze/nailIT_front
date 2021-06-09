@@ -37,6 +37,7 @@
                             class="code-v"
                             v-model="num"
                             @input="check"
+                            inputmode="numeric"
                         />
                     </div>
                 </div>
@@ -126,6 +127,7 @@
                             class="tel"
                             placeholder="+7 966 999 88 77"
                             v-model="phone"
+                            inputmode="numeric"
                         />
                     </div>
                 </div>
@@ -142,7 +144,12 @@
             <div class="row">
                 <div class="col-12 pl-0 pr-0">
                     <div
-                        class="btn-group d-flex justify-content-between align-items-center"
+                        class="
+                            btn-group
+                            d-flex
+                            justify-content-between
+                            align-items-center
+                        "
                     >
                         <div>
                             <a href="#" @click="step = 1" class="btn btn-back">
@@ -167,43 +174,127 @@
                     <img class="center-fit" id="myImage" src="" alt="" />
                 </div>
             </div>
+            <div class="info" v-if="openInfo">
+                <div class="row templates">
+                    <div class="col-12">
+                        <div @click="openInfo = false" class="back">
+                            <img src="images/back.png" alt="back" />
+                        </div>
+                        <div class="title d-flex justify-content-center">
+                            <div class="h1">INFO</div>
+                        </div>
+                        <div class="now-choose">Текущий выбор</div>
+                        <div
+                            class="
+                                name-color
+                                d-flex
+                                align-items-center
+                                justify-content-between
+                            "
+                        >
+                            <div class="h1">Название цвета</div>
+                            <div class="choose">{{ activeColor.title }}</div>
+                        </div>
+                        <div
+                            class="
+                                brand
+                                d-flex
+                                align-items-center
+                                justify-content-between
+                            "
+                        >
+                            <div class="h1">Бренд цвета</div>
+                            <div class="choose">{{ activeColor["Бренд"] }}</div>
+                        </div>
+                        <div
+                            class="
+                                collection
+                                d-flex
+                                align-items-center
+                                justify-content-between
+                            "
+                        >
+                            <div class="h1">Коллекция цвета</div>
+                            <div class="choose">
+                                {{ activeColor["Коллекция"] }}
+                            </div>
+                        </div>
+                        <div
+                            class="
+                                d-flex
+                                align-items-center
+                                justify-content-between
+                            "
+                        >
+                            <div class="h1">Фото цвета</div>
+                            <div class="choose">
+                                <img
+                                    :src="activeColor.photo"
+                                    class="photo-color"
+                                    alt=""
+                                />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <div class="setting">
                 <div
                     class="row templates"
                     :class="{ 'hide-sett': closeSetting }"
                 >
-                    <div class="col-4 pt-2 pb-2" style="text-align: left">
-                        <img src="images/filtr.png" alt="" /> Фильтр
-                    </div>
-                    <div
-                        class="col-4 pt-2 pb-2"
-                        v-if="activeWin == 2"
-                        style="text-align: center"
-                    >
-                        <span> Цвет</span>
-                    </div>
-                    <div
-                        class="col-4 pt-2 pb-2"
-                        v-if="activeWin == 1"
-                        style="text-align: center"
-                    >
-                        <span>Стемпинг</span>
-                    </div>
-                    <div
-                        class="col-4 d-flex justify-content-end pt-2 pb-2"
-                        style="text-align: "
-                        @click="closeSetting = !closeSetting"
-                        v-if="!closeSetting"
-                    >
-                        Скрыть
-                    </div>
-                    <div
-                        class="col-4 d-flex justify-content-end pt-2 pb-2"
-                        style="text-align: "
-                        @click="closeSetting = !closeSetting"
-                        v-if="closeSetting"
-                    >
-                        Раскрыть
+                    <div class="col-12">
+                        <div class="row info-block">
+                            <div
+                                class="col-4 pt-2 pb-2"
+                                style="text-align: left"
+                                @click="openInfo = true"
+                            >
+                                INFO
+                            </div>
+                            <div
+                                class="col-4 pt-2 pb-2"
+                                v-if="activeWin == 2"
+                                style="text-align: center"
+                            >
+                                <span> Цвет</span>
+                            </div>
+                            <div
+                                class="col-4 pt-2 pb-2"
+                                v-if="activeWin == 1"
+                                style="text-align: center"
+                            >
+                                <span>Стемпинг</span>
+                            </div>
+                            <div
+                                class="
+                                    col-4
+                                    d-flex
+                                    justify-content-end
+                                    pt-2
+                                    pb-2
+                                "
+                                style="text-align: "
+                                @click="closeSetting = !closeSetting"
+                                v-if="!closeSetting"
+                            >
+                                Скрыть
+                            </div>
+                            <div
+                                class="
+                                    col-4
+                                    d-flex
+                                    justify-content-end
+                                    pt-2
+                                    pb-2
+                                "
+                                style="text-align: "
+                                @click="closeSetting = !closeSetting"
+                                v-if="closeSetting"
+                            >
+                                Раскрыть
+                            </div>
+                        </div>
                     </div>
 
                     <div class="col-12 d-flex temp" v-if="activeWin == 1">
@@ -229,7 +320,7 @@
                             v-for="(item, index) in color"
                             :key="index"
                             :id="item['color code']"
-                            @click="getColor(item['🔒 Row ID'])"
+                            @click="getColor(item['🔒 Row ID'], item)"
                         >
                             <img :src="item['photo']" alt="" />
                         </div>
@@ -291,6 +382,8 @@
                 closeSetting: false,
                 photoNone: "",
                 load: false,
+                openInfo: false,
+                activeColor: {},
             };
         },
         computed: {
@@ -323,8 +416,9 @@
                         document.getElementById("link-download").href = this.url;
                     });
             },
-            getColor(id) {
-                console.log(id);
+            getColor(id, item) {
+                this.activeColor = item;
+                console.log(this.activeColor);
                 this.$axios
                     .$get(
                         `/equip?photo_name=${this.photo_name}&stamping_condition=${this.stamping_condition}&color_condition=${this.color_condition}&color=${id}`
@@ -604,6 +698,7 @@
     .temp {
         justify-content: space-between;
         flex-wrap: wrap;
+        padding-top: 50px;
     }
     .temp img {
         width: 60px;
@@ -703,6 +798,78 @@
         height: 100%;
         left: 0;
         top: 0;
+    }
+    .info-block {
+        position: fixed;
+        width: 100vw;
+        background: white;
+        z-index: 1000;
+        border-radius: 14px 14px 0px 0px;
+    }
+    .info .templates {
+        z-index: 2000;
+        width: 100vw;
+    }
+    .info {
+        width: 100vw;
+    }
+    .info .h1 {
+        font-family: Lato;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 16px;
+        line-height: 24px;
+        /* or 150% */
+
+        color: #334669;
+    }
+    .info .title {
+        font-size: 14px;
+        line-height: 24px;
+        /* identical to box height, or 171% */
+
+        text-align: center;
+
+        color: #334669;
+        margin-top: 15px;
+    }
+    .info .now-choose {
+        font-size: 18px;
+        line-height: 40px;
+        color: #334669;
+        margin-top: 10px;
+        font-weight: normal;
+    }
+    .info .back {
+        position: absolute;
+        top: 15px;
+        left: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 35px;
+        height: 35px;
+        border-radius: 50px;
+        background: #f8f3f3;
+        box-shadow: -7px -7px 12px rgba(255, 255, 255, 0.0155704),
+            -13px -7px 15px rgba(246, 251, 255, 0.741505),
+            -8px 5px 12px rgba(244, 248, 251, 0.345662),
+            2px 9px 30px rgba(201, 170, 170, 0.795345);
+    }
+    .info .choose {
+        font-family: Lato;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 16px;
+        line-height: 24px;
+        /* or 150% */
+
+        color: #334669;
+
+        mix-blend-mode: normal;
+    }
+    .info .photo-color {
+        width: 40px;
     }
     @keyframes rot {
         0% {
